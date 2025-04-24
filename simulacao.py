@@ -24,7 +24,7 @@ p = 0.88
 capacidade = 120
 
 prob_overbooking = 1 - binom.cdf(capacidade, vendidos, p)
-    prob_overbooking = 1 - binom.cdf(capacidade, vendidos, p)
+
 
     st.metric("Probabilidade de Overbooking (>120 passageiros)", f"{prob_overbooking*100:.2f}%")
 
