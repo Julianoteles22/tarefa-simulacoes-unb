@@ -1,3 +1,5 @@
+import streamlit as st
+
 # Criação de abas para diferentes distribuições
 tab1, tab2, tab3, tab4 = st.tabs([
     "Distribuição Binomial", 
