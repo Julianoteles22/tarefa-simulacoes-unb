@@ -26,15 +26,15 @@ capacidade = 120
 prob_overbooking = 1 - binom.cdf(capacidade, vendidos, p)
 
 
-    st.metric("Probabilidade de Overbooking (>120 passageiros)", f"{prob_overbooking*100:.2f}%")
+st.metric("Probabilidade de Overbooking (>120 passageiros)", f"{prob_overbooking*100:.2f}%")
 
-    st.markdown("---")
-    st.subheader("Limite de Risco de Overbooking (até 7%)")
-    st.markdown("Como o risco não pode ultrapassar 7%, vamos verificar até quantas passagens podem ser vendidas mantendo essa condição.")
+st.markdown("---")
+st.subheader("Limite de Risco de Overbooking (até 7%)")
+st.markdown("Como o risco não pode ultrapassar 7%, vamos verificar até quantas passagens podem ser vendidas mantendo essa condição.")
 
-    limite_passagens = np.arange(120, 151)
-    riscos = [1 - binom.cdf(capacidade, n, p) for n in limite_passagens]
-    df_riscos = pd.DataFrame({"Passagens Vendidas": limite_passagens, "Risco de Overbooking": riscos})
+limite_passagens = np.arange(120, 151)
+riscos = [1 - binom.cdf(capacidade, n, p) for n in limite_passagens]
+df_riscos = pd.DataFrame({"Passagens Vendidas": limite_passagens, "Risco de Overbooking": riscos})
 
     fig_risco = px.line(df_riscos, x="Passagens Vendidas", y="Risco de Overbooking",
                         title="Risco de Overbooking conforme Número de Passagens Vendidas",
