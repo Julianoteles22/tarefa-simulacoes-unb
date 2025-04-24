@@ -1,4 +1,8 @@
 import streamlit as st
+import numpy as np
+import pandas as pd
+import plotly.express as px
+from scipy.stats import binom
 
 # Criação de abas para diferentes distribuições
 tab1, tab2, tab3, tab4 = st.tabs([
@@ -9,7 +13,6 @@ tab1, tab2, tab3, tab4 = st.tabs([
 ])
 
 # --- QUESTÃO 1 ---
-# Adaptação no tab1: Distribuição Binomial para Overbooking
 with tab1:
     st.header("Distribuição Binomial: Overbooking Aéreo")
     st.markdown("### Questão 1 - Análise de Overbooking na Companhia Aérea Aérea Confiável")
@@ -19,22 +22,20 @@ with tab1:
     Vamos calcular a **probabilidade de overbooking** (mais de 120 pessoas comparecerem).
     """)
 
-vendidos = 130
-p = 0.88
-capacidade = 120
+    vendidos = 130
+    p = 0.88
+    capacidade = 120
 
-prob_overbooking = 1 - binom.cdf(capacidade, vendidos, p)
+    prob_overbooking = 1 - binom.cdf(capacidade, vendidos, p)
+    st.metric("Probabilidade de Overbooking (>120 passageiros)", f"{prob_overbooking*100:.2f}%")
 
+    st.markdown("---")
+    st.subheader("Limite de Risco de Overbooking (até 7%)")
+    st.markdown("Como o risco não pode ultrapassar 7%, vamos verificar até quantas passagens podem ser vendidas mantendo essa condição.")
 
-st.metric("Probabilidade de Overbooking (>120 passageiros)", f"{prob_overbooking*100:.2f}%")
-
-st.markdown("---")
-st.subheader("Limite de Risco de Overbooking (até 7%)")
-st.markdown("Como o risco não pode ultrapassar 7%, vamos verificar até quantas passagens podem ser vendidas mantendo essa condição.")
-
-limite_passagens = np.arange(120, 151)
-riscos = [1 - binom.cdf(capacidade, n, p) for n in limite_passagens]
-df_riscos = pd.DataFrame({"Passagens Vendidas": limite_passagens, "Risco de Overbooking": riscos})
+    limite_passagens = np.arange(120, 151)
+    riscos = [1 - binom.cdf(capacidade, n, p) for n in limite_passagens]
+    df_riscos = pd.DataFrame({"Passagens Vendidas": limite_passagens, "Risco de Overbooking": riscos})
 
     fig_risco = px.line(df_riscos, x="Passagens Vendidas", y="Risco de Overbooking",
                         title="Risco de Overbooking conforme Número de Passagens Vendidas",
@@ -51,7 +52,7 @@ df_riscos = pd.DataFrame({"Passagens Vendidas": limite_passagens, "Risco de Over
     st.markdown("---")
     st.subheader("Análise de Viabilidade Financeira: Vender +10 Assentos")
 
-    st.markdown("""
+    st.markdown(f"""
     Se forem vendidas 130 passagens (10 acima da capacidade), o risco de overbooking será de aproximadamente
     **{prob_overbooking*100:.2f}%**. Se o custo por passageiro realocado for de R$ 500:
     """)
@@ -68,9 +69,7 @@ df_riscos = pd.DataFrame({"Passagens Vendidas": limite_passagens, "Risco de Over
     else:
         st.warning("A venda de 10 passagens extras pode não compensar o custo de possíveis indenizações.")
 
-
 # --- QUESTÃO 2 ---
-# Adaptação no tab4: Simulação de ROI para novo sistema de informação
 with tab4:
     st.header("Simulação Interativa de ROI - Novo Sistema de Informação")
     st.markdown("""
@@ -103,7 +102,6 @@ with tab4:
     fig_roi = px.histogram(df_sim, x="ROI (%)", nbins=40, title="Distribuição Simulada de ROI")
     st.plotly_chart(fig_roi, use_container_width=True)
 
-    # Probabilidade da receita ser inferior a R$ 60.000
     prob_baixa = np.mean(sim_receita < 60000)
     st.metric("Prob. de Receita < R$ 60.000", f"{prob_baixa*100:.2f}%")
 
