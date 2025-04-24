@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from scipy.stats import binom
+from scipy.stats import binom, poisson, norm
 
 # Criação de abas para diferentes distribuições
 tab1, tab2, tab3, tab4 = st.tabs([
@@ -59,7 +59,7 @@ with tab1:
 
     custo_indenizacao = 500
     custo_esperado = prob_overbooking * custo_indenizacao * (vendidos - capacidade)
-    lucro_extra = 10 * 500  # Supondo R$ 500 por passagem extra vendida
+    lucro_extra = 10 * 500
 
     st.metric("Lucro Bruto com 10 Passagens Extras", f"R$ {lucro_extra:,.2f}".replace(",", "."))
     st.metric("Custo Esperado com Overbooking", f"R$ {custo_esperado:,.2f}".replace(",", "."))
@@ -68,6 +68,40 @@ with tab1:
         st.success("A venda de 10 passagens extras é **financeiramente viável** neste cenário.")
     else:
         st.warning("A venda de 10 passagens extras pode não compensar o custo de possíveis indenizações.")
+
+# --- DISTRIBUIÇÃO POISSON ---
+with tab2:
+    st.header("Distribuição de Poisson - Chegada de Clientes por Hora")
+    st.markdown("""
+    Simulação da chegada de clientes a uma loja. A taxa média de chegada (\( \lambda \)) representa o número médio de clientes por hora.
+    """)
+
+    lambda_val = st.slider("Taxa média de chegada de clientes (por hora)", 1, 20, 5)
+    horas = np.arange(0, 15)
+    probabilidades = poisson.pmf(horas, mu=lambda_val)
+    df_poisson = pd.DataFrame({"Número de Clientes": horas, "Probabilidade": probabilidades})
+
+    fig_poisson = px.bar(df_poisson, x="Número de Clientes", y="Probabilidade",
+                         title="Distribuição de Poisson - Número de Clientes por Hora")
+    st.plotly_chart(fig_poisson, use_container_width=True)
+
+# --- DISTRIBUIÇÃO NORMAL ---
+with tab3:
+    st.header("Distribuição Normal - Vendas de Produtos")
+    st.markdown("""
+    Simulação do número de produtos vendidos com distribuição normal. Ajuste os parâmetros abaixo:
+    """)
+
+    media = st.slider("Média (número médio de produtos)", 50, 150, 100)
+    desvio = st.slider("Desvio padrão", 5, 30, 15)
+
+    x = np.linspace(media - 4*desvio, media + 4*desvio, 100)
+    y = norm.pdf(x, media, desvio)
+    df_normal = pd.DataFrame({"Quantidade Vendida": x, "Densidade": y})
+
+    fig_normal = px.area(df_normal, x="Quantidade Vendida", y="Densidade",
+                         title="Distribuição Normal das Vendas")
+    st.plotly_chart(fig_normal, use_container_width=True)
 
 # --- QUESTÃO 2 ---
 with tab4:
@@ -115,3 +149,4 @@ with tab4:
         st.success("O sistema é promissor com ROI médio positivo. Recomenda-se a adoção, com monitoramento do desempenho.")
     else:
         st.warning("O sistema apresenta risco elevado de prejuízo. Avaliar melhorias antes da adoção definitiva.")
+
