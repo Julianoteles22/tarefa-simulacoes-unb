@@ -1,3 +1,11 @@
+# Criação de abas para diferentes distribuições
+tab1, tab2, tab3, tab4 = st.tabs([
+    "Distribuição Binomial", 
+    "Distribuição Poisson", 
+    "Distribuição Normal", 
+    "Simulação de ROI"
+])
+
 # --- QUESTÃO 1 ---
 # Adaptação no tab1: Distribuição Binomial para Overbooking
 with tab1:
