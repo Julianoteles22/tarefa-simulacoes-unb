@@ -17,8 +17,8 @@ with tab1:
     st.header("Distribuição Binomial: Overbooking Aéreo")
     st.markdown("""
 **Contexto Detalhado:**
-A Aérea Confiável vendeu um número de passagens acima da capacidade do voo para maximizar a ocupação, apostando que nem todos os passageiros comparecerão. Este módulo interativo permite ajustar parâmetros-chave e visualizar, de forma dinâmica, o comportamento da probabilidade de overbooking e suas implicações financeiras.  citeturn0file0
-""" )
+A Aérea Confiável vendeu um número de passagens acima da capacidade do voo para maximizar a ocupação, apostando que nem todos os passageiros comparecerão. Este módulo interativo permite ajustar parâmetros-chave e visualizar, de forma dinâmica, o comportamento da probabilidade de overbooking e suas implicações financeiras.  
+""")
 
     # Inputs interativos
     vendidos = st.slider("Passagens Vendidas", min_value=120, max_value=200, value=130)
@@ -65,15 +65,18 @@ A Aérea Confiável vendeu um número de passagens acima da capacidade do voo pa
     # Análise Financeira
     st.subheader("Viabilidade Financeira: +10 Assentos")
     custo_ind = st.number_input("Custo de Indenização por Passageiro (R$)", value=500)
-    lucro_extra = 10 * (st.number_input("Preço Médio por Passagem (R$)", value=500))
+    preco_medio = st.number_input("Preço Médio por Passagem (R$)", value=500)
+    lucro_extra = 10 * preco_medio
     custo_esperado = prob_overbooking * custo_ind * (vendidos - capacidade)
     st.metric("Lucro Bruto com 10 Passagens Extras", f"R$ {lucro_extra:,.2f}".replace(",", "."))
     st.metric("Custo Esperado de Indenizações", f"R$ {custo_esperado:,.2f}".replace(",", "."))
-    st.markdown("""
-**Análise Crítica:**
-- Mesmo com aumento de receita, o custo esperado de indenizações pode reduzir significantemente a margem de lucro.
-- Dependendo do perfil dos clientes e custo reputacional, a estratégia deve ser balanceada com seguros ou políticas de flexibilização no embarque.
-""" )
+
+    texto_critico = (
+        "**Análise Crítica:**\n"
+        "- Mesmo com aumento de receita, o custo esperado de indenizações pode reduzir significativamente a margem de lucro.\n"
+        "- Dependendo do perfil dos clientes e custo reputacional, a estratégia deve ser balanceada com seguros ou políticas de flexibilização no embarque."
+    )
+    st.markdown(texto_critico)
 
 # --- DISTRIBUIÇÃO POISSON ---
 with tab2:
@@ -106,8 +109,8 @@ with tab3:
 with tab4:
     st.header("Simulação Interativa de ROI - Sistema de Informação")
     st.markdown("""
-Neste módulo, você pode ajustar parâmetros financeiros e quantidade de simulações para entender como a incerteza afeta o retorno sobre o investimento do novo sistema. citeturn0file0
-""" )
+Neste módulo, você pode ajustar parâmetros financeiros e quantidade de simulações para entender como a incerteza afeta o retorno sobre o investimento do novo sistema.
+""")
     receita_esp = st.number_input("Receita Adicional Esperada (R$)", value=80000)
     custo_op = st.number_input("Custo Operacional Anual (R$)", value=10000)
     investimento = st.number_input("Investimento Inicial (R$)", value=50000)
@@ -120,8 +123,8 @@ Neste módulo, você pode ajustar parâmetros financeiros e quantidade de simula
     sim_receita = np.random.normal(loc=receita_esp, scale=0.2 * receita_esp, size=n_sim)
     sim_lucro = sim_receita - custo_op
     sim_roi = (sim_lucro / investimento) * 100
-    df_sim = pd.DataFrame({"ROI (%)": sim_roi})
 
+    df_sim = pd.DataFrame({"ROI (%)": sim_roi})
     fig_hist = px.histogram(
         df_sim, x="ROI (%)", nbins=40,
         title="Distribuição Simulada de ROI",
@@ -129,19 +132,24 @@ Neste módulo, você pode ajustar parâmetros financeiros e quantidade de simula
     )
     st.plotly_chart(fig_hist, use_container_width=True)
 
-    # Função de distribuição acumulada para insights
-    fig_cdf = px.ecdf(df_sim, x="ROI (%)", title="CDF do ROI Simulado")
+    # Gráfico CDF para insights
+    fig_cdf = px.ecdf(
+        df_sim, x="ROI (%)", title="CDF do ROI Simulado"
+    )
     st.plotly_chart(fig_cdf, use_container_width=True)
 
     prob_neg = np.mean(sim_roi < 0)
     st.metric("Probabilidade ROI Negativo", f"{prob_neg:.2%}")
 
-    st.markdown("""
-**Interpretação de Cenários:**
-- Cenário Otimista: ROI máximo de aproximadamente **{:.2f}%**.
-- Cenário Pessimista: ROI mínimo de aproximadamente **{:.2f}%**.
-- Probabilidade de retorno negativo de **{:.2%}** sugere necessidade de estratégias de mitigação de risco.
-""".format(np.max(sim_roi), np.min(sim_roi), prob_neg)
+    # Interpretação de cenários formatada separadamente
+    texto_cenarios = (
+        "**Interpretação de Cenários:**\n"
+        f"- Cenário Otimista: ROI máximo de aproximadamente **{np.max(sim_roi):.2f}%**.\n"
+        f"- Cenário Pessimista: ROI mínimo de aproximadamente **{np.min(sim_roi):.2f}%**.\n"
+        f"- Probabilidade de retorno negativo de **{prob_neg:.2%}** sugere necessidade de estratégias de mitigação de risco."
+    )
+    st.markdown(texto_cenarios)
+
     if np.mean(sim_roi) > 0:
         st.success("Investimento demonstra ROI médio positivo e potencial viabilidade.")
     else:
