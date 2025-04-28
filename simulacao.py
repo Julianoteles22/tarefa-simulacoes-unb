@@ -3,9 +3,18 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 from scipy.stats import binom, poisson, norm
+from PIL import Image
+import os
 
-# Cabeçalho com logo, título e nomes dos alunos
-st.image("/mnt/data/68eda775-1c4b-4650-bb7c-39693898b0d7.png", width=200)
+# Logo da UnB (arquivo deve estar no mesmo diretório do script)
+logo_path = os.path.join(os.path.dirname(__file__), "68eda775-1c4b-4650-bb7c-39693898b0d7.png")
+if os.path.exists(logo_path):
+    img = Image.open(logo_path)
+    st.image(img, width=200)
+else:
+    st.warning("Logo da UnB não encontrado. Verifique o caminho do arquivo.")
+
+# Título e alunos
 st.title("Overbooking e ROI: Explorando Decisões de Dados e Lucros")
 st.markdown(
     """
