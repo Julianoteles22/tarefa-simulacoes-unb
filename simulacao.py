@@ -4,6 +4,17 @@ import pandas as pd
 import plotly.express as px
 from scipy.stats import binom, poisson, norm
 
+# Cabeçalho com logo, título e nomes dos alunos
+st.image("/mnt/data/68eda775-1c4b-4650-bb7c-39693898b0d7.png", width=200)
+st.title("Overbooking e ROI: Explorando Decisões de Dados e Lucros")
+st.markdown(
+    """
+**Alunos:**  
+- Juliano Teles Abrahao - 231013411  
+- João Pedro Carvalho - 231013402
+"""
+)
+
 # Criação de abas para diferentes distribuições
 tab1, tab2, tab3, tab4 = st.tabs([
     "Distribuição Binomial", 
@@ -17,15 +28,13 @@ with tab1:
     st.header("Distribuição Binomial: Overbooking Aéreo")
     st.markdown("""
 **Contexto Detalhado:**
-A Aérea Confiável vendeu um número de passagens acima da capacidade do voo para maximizar a ocupação, apostando que nem todos os passageiros comparecerão. Este módulo interativo permite ajustar parâmetros-chave e visualizar, de forma dinâmica, o comportamento da probabilidade de overbooking e suas implicações financeiras.  
+A Aérea Confiável vendeu um número de passagens acima da capacidade do voo para maximizar a ocupação, apostando que nem todos os passageiros comparecerão. Este módulo interativo permite ajustar parâmetros-chave e visualizar, de forma dinâmica, o comportamento da probabilidade de overbooking e suas implicações financeiras.
 """)
 
-    # Inputs interativos
     vendidos = st.slider("Passagens Vendidas", min_value=120, max_value=200, value=130)
     p = st.slider("Taxa de Comparecimento (%)", min_value=0.0, max_value=1.0, value=0.88, step=0.01)
     capacidade = st.number_input("Capacidade do Voo", min_value=1, value=120)
 
-    # Distribuição Binomial
     xs = np.arange(0, vendidos + 1)
     pmf = binom.pmf(xs, vendidos, p)
     df_pmf = pd.DataFrame({"Comparecimentos": xs, "Probabilidade": pmf})
@@ -39,11 +48,9 @@ A Aérea Confiável vendeu um número de passagens acima da capacidade do voo pa
                      annotation_text="Capacidade", annotation_position="top right")
     st.plotly_chart(fig_pmf, use_container_width=True)
 
-    # Cálculo de overbooking
     prob_overbooking = 1 - binom.cdf(capacidade, vendidos, p)
     st.metric("Probabilidade de Overbooking (> capacidade)", f"{prob_overbooking:.2%}")
 
-    # Limite de risco 7%
     st.subheader("Limite de Risco de Overbooking (≤ 7%)")
     vendas_test = np.arange(capacidade, vendidos * 2 + 1)
     riscos = [1 - binom.cdf(capacidade, n, p) for n in vendas_test]
@@ -62,7 +69,6 @@ A Aérea Confiável vendeu um número de passagens acima da capacidade do voo pa
     else:
         st.error("Nenhuma quantidade de passagens mantém o risco abaixo de 7%.")
 
-    # Análise Financeira
     st.subheader("Viabilidade Financeira: +10 Assentos")
     custo_ind = st.number_input("Custo de Indenização por Passageiro (R$)", value=500)
     preco_medio = st.number_input("Preço Médio por Passagem (R$)", value=500)
@@ -119,7 +125,6 @@ Neste módulo, você pode ajustar parâmetros financeiros e quantidade de simula
     roi_esp = (receita_esp - custo_op) / investimento * 100
     st.metric("ROI Esperado", f"{roi_esp:.2f}%")
 
-    # Simulação Monte Carlo
     sim_receita = np.random.normal(loc=receita_esp, scale=0.2 * receita_esp, size=n_sim)
     sim_lucro = sim_receita - custo_op
     sim_roi = (sim_lucro / investimento) * 100
@@ -132,7 +137,6 @@ Neste módulo, você pode ajustar parâmetros financeiros e quantidade de simula
     )
     st.plotly_chart(fig_hist, use_container_width=True)
 
-    # Gráfico CDF para insights
     fig_cdf = px.ecdf(
         df_sim, x="ROI (%)", title="CDF do ROI Simulado"
     )
@@ -141,7 +145,6 @@ Neste módulo, você pode ajustar parâmetros financeiros e quantidade de simula
     prob_neg = np.mean(sim_roi < 0)
     st.metric("Probabilidade ROI Negativo", f"{prob_neg:.2%}")
 
-    # Interpretação de cenários formatada separadamente
     texto_cenarios = (
         "**Interpretação de Cenários:**\n"
         f"- Cenário Otimista: ROI máximo de aproximadamente **{np.max(sim_roi):.2f}%**.\n"
