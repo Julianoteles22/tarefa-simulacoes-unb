@@ -8,7 +8,7 @@ import os
 
 # Logo da UnB (arquivo "unb-logo.webp" na mesma pasta)
 script_dir = os.path.dirname(__file__)
-logo_path = os.path.join(script_dir, "unb-logo.webp")
+logo_path = os.path.join(script_dir, "trabalhar-na-UnB-1200x1200.png")
 if os.path.exists(logo_path):
     img = Image.open(logo_path)
     st.image(img, width=200)
